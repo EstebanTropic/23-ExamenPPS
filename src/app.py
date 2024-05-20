@@ -73,4 +73,4 @@ def user_update(id: int, alu: schemas.StudentIn):
     db.session.commit()
     return res
 
-# comentario para subir a github examen2
+# comentario para subir a github examen2.yml
