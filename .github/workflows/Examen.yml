@@ -1,0 +1,57 @@
+name: Examen
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - src/**
+
+jobs:
+  build:
+    name: build and push Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+          
+      - name: Login to DockerHub
+        uses: docker/login-action@v2 
+        with:
+          username: ${{ secrets.DH_USERNAME }}
+          password: ${{ secrets.DH_TOKEN }}
+          
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true 
+          tags: ${{ secrets.DH_USERNAME }}/fastapi:latest
+
+  aws:
+    name: Deploy image to aws
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: multiple command
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.AWS_IP }}
+        username: ${{ secrets.AWS_USUARIO }}
+        key: ${{ secrets.AWS_CLAVE }}
+        port: 22  # ${{ secrets.PORT }}
+        script: |
+            sleep 40
+            docker stop web && docker rm web
+            docker rmi ${{ secrets.DH_USERNAME }}/fastapi
+            docker run -d -p 80:8000 --name web ${{ secrets.DH_USERNAME }}/fastapi:latest
+
+  # check:  
+  #   name: checkfor status 200
+  #   runs-on: ubuntu-latest
+  #   needs: aws
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - id: text
+  #       uses: johnlokerse/website-healthcheck@v2
+  #       with:
+  #         web-url: "http://${{ secrets.AWS_HOSTNAME }}:8000"
+  #         scan-for-text: "Hello"
