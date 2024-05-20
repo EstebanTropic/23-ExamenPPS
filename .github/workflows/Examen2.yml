@@ -26,7 +26,7 @@ jobs:
       - id: text
         uses: johnlokerse/website-healthcheck@v2
         with:
-          web-url: "http://${{ secrets.AWS_IP}}/students/1
+          web-url: "http://${{ secrets.AWS_IP}}/students/1"
           scan-for-text: "name"
   check3:  
     name: checkfor status 200
