@@ -15,5 +15,5 @@ jobs:
       - id: text
         uses: johnlokerse/website-healthcheck@v2
         with:
-          web-url: "http:localhost/docs"
+          web-url: "http://${{ secrets.AWS_IP}}/docs"
           scan-for-text: "FastAPI"
